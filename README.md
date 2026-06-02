@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="assets/agentic-browser-webapp.png">
-    <img alt="Agentic Browser screenshot" src="assets/agentic-browser-webapp.png" width="920">
+    <img alt="AgInTi Browser webapp screenshot" src="assets/agentic-browser-webapp.png" width="920">
   </a>
 </p>
 
