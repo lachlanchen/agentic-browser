@@ -383,8 +383,7 @@ printf '/status\n/observe\n/exit\n' | ./agentic-browser chat
 Observed result:
 
 - `status` reported CDP `9344`, model `gpt-5.4-mini / low`.
-- `open --guarded https://example.com` opened a tab in the headless controlled
-  browser.
+- `open --guarded https://example.com` opened a tab in the controlled browser.
 - `observe` reported `Example Domain`, regular allowed policy, and DOM state.
 - Autonomous CLI goal completed with status `extract`, run
   `20260602-130503-a3e6e7`.
@@ -503,6 +502,9 @@ Solution:
   and separate tmux session.
 - The agent/browser work then happens away from the main `8791` instance.
 - You control it from the webapp screenshot/DOM UI at `http://127.0.0.1:8794`.
+- In the default `xephyr` mode, the same target website is visible in two
+  places: the real controlled Chrome window inside the Xephyr virtual desktop,
+  and the webapp's embedded screenshot/DOM viewport.
 
 Start:
 
@@ -543,8 +545,9 @@ Mode behavior:
 - `xephyr`: nested X desktop in one container window. Requires `Xephyr`.
 - `headless`: no X desktop; Chrome runs with `--headless=new`. Use the webapp
   screenshot/DOM UI for access.
-- `auto`: chooses `xvfb` if available, then `xephyr`, then `headless`.
-- Default mode is `headless` to avoid stealing focus from the real desktop.
+- `auto`: chooses `xephyr` if available, then `xvfb`, then `headless`.
+- Default mode is `xephyr`, so the controlled Chrome is visible inside a
+  contained virtual desktop window instead of running headless.
 
 Current machine status observed during setup:
 
@@ -557,9 +560,9 @@ Current machine status observed during setup:
 
 Recommended modes:
 
-- If you want zero visible windows: use `AGENTIC_VDESKTOP_MODE=headless`.
-- If you want a movable contained desktop window: use
+- If you want a movable contained desktop window: use the default
   `AGENTIC_VDESKTOP_MODE=xephyr`.
+- If you want zero visible windows: use `AGENTIC_VDESKTOP_MODE=headless`.
 - If you later install `Xvfb`: use `AGENTIC_VDESKTOP_MODE=xvfb`.
 
 Custom ports/profile:

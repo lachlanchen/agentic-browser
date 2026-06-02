@@ -50,7 +50,9 @@ Then open:
 http://127.0.0.1:8794
 ```
 
-The default virtual desktop mode is headless, so the controlled Chrome will not steal focus. You still see and control the target website through the webapp screenshot and DOM panels.
+The default virtual desktop mode is visible Xephyr. The controlled Chrome opens
+target websites inside one contained virtual-desktop window, while the webapp
+also shows the same selected tab through its screenshot and DOM panels.
 
 ## Main Commands
 
@@ -87,8 +89,8 @@ Run the process-level agent without the GUI:
 
 | Mode | Use Case | Command |
 | --- | --- | --- |
+| Xephyr | Default. One contained nested desktop window, so you can see the controlled Chrome itself | `./run-agentic-browser-vdesktop.sh start` |
 | Headless | No visible controlled browser window; best for background work | `AGENTIC_VDESKTOP_MODE=headless ./run-agentic-browser-vdesktop.sh start` |
-| Xephyr | One contained nested desktop window; useful when you want to see Chrome itself | `AGENTIC_VDESKTOP_MODE=xephyr ./run-agentic-browser-vdesktop.sh start` |
 | Xvfb | Fully off-screen X desktop when Xvfb is installed | `AGENTIC_VDESKTOP_MODE=xvfb ./run-agentic-browser-vdesktop.sh start` |
 | Direct | Local webapp and normal controlled Chrome profile | `./run-embedded-agentic-browser.sh` |
 
@@ -137,8 +139,8 @@ python3 -m unittest discover -s embedded_agentic_browser/tests
 
 Current copied validation from the source workspace:
 
-- Webapp-driven headless browsing worked through `http://127.0.0.1:8794`.
-- Webapp-driven Xephyr/windowed browsing worked through `http://127.0.0.1:8815`.
+- Webapp-driven Xephyr/windowed browsing worked through `http://127.0.0.1:8794`.
+- Webapp-driven headless browsing also worked when explicitly requested.
 - CLI/API smoke tests worked for `status`, `open`, `observe`, and autonomous `goal`.
 - Unit suite: `48` tests passing.
 
@@ -147,4 +149,3 @@ Current copied validation from the source workspace:
 This repo was extracted from a book/workflow automation workspace into a standalone Agentic Browser project. Future Agentic Browser development should happen here, not inside the Books repo.
 
 Build less. Browse with more control.
-

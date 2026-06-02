@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 SESSION="${AGENTIC_VDESKTOP_SESSION:-agentic-browser-vdesktop}"
-MODE="${AGENTIC_VDESKTOP_MODE:-headless}"
+MODE="${AGENTIC_VDESKTOP_MODE:-xephyr}"
 DISPLAY_ID="${AGENTIC_VDESKTOP_DISPLAY:-:78}"
 GEOMETRY="${AGENTIC_VDESKTOP_GEOMETRY:-1600x1000}"
 XEPHYR_DEPTH="${AGENTIC_VDESKTOP_XEPHYR_DEPTH:-16/16}"
@@ -70,10 +70,10 @@ choose_mode() {
     printf '%s\n' "$MODE"
     return
   fi
-  if have Xvfb; then
-    printf 'xvfb\n'
-  elif have Xephyr; then
+  if have Xephyr; then
     printf 'xephyr\n'
+  elif have Xvfb; then
+    printf 'xvfb\n'
   else
     printf 'headless\n'
   fi
