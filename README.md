@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://lazying.art">
-    <img alt="Agentic Browser screenshot" src="assets/agentic-browser-webapp.png" width="920">
+    <img alt="LazyingArt banner" src="https://github.com/lachlanchen/lachlanchen/raw/main/figs/banner.png" width="920">
   </a>
 </p>
 
@@ -10,6 +10,12 @@
 
 <p align="center">
   <strong>A local-first Chrome/CDP browser workbench for human-supervised AI browsing.</strong>
+</p>
+
+<p align="center">
+  <a href="assets/agentic-browser-webapp.png">
+    <img alt="Agentic Browser screenshot" src="assets/agentic-browser-webapp.png" width="920">
+  </a>
 </p>
 
 <p align="center">
@@ -148,4 +154,15 @@ Current copied validation from the source workspace:
 
 This repo was extracted from a book/workflow automation workspace into a standalone Agentic Browser project. Future Agentic Browser development should happen here, not inside the Books repo.
 
-Build less. Browse with more control.
+## Support
+
+| Donate | PayPal | Stripe |
+| --- | --- | --- |
+| [![Donate](https://camo.githubusercontent.com/24a4914f0b42c6f435f9e101621f1e52535b02c225764b2f6cc99416926004b7/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446f6e6174652d4c617a79696e674172742d3045413545393f7374796c653d666f722d7468652d6261646765266c6f676f3d6b6f2d6669266c6f676f436f6c6f723d7768697465)](https://chat.lazying.art/donate) | [![PayPal](https://camo.githubusercontent.com/d0f57e8b016517a4b06961b24d0ca87d62fdba16e18bbdb6aba28e978dc0ea21/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f50617950616c2d526f6e677a686f754368656e2d3030343537433f7374796c653d666f722d7468652d6261646765266c6f676f3d70617970616c266c6f676f436f6c6f723d7768697465)](https://paypal.me/RongzhouChen) | [![Stripe](https://camo.githubusercontent.com/1152dfe04b6943afe3a8d2953676749603fb9f95e24088c92c97a01a897b4942/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f5374726970652d446f6e6174652d3633354246463f7374796c653d666f722d7468652d6261646765266c6f676f3d737472697065266c6f676f436f6c6f723d7768697465)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
+
+## Contact
+
+[![GitHub](https://img.shields.io/badge/GitHub-lachlanchen-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/lachlanchen)
+[![Email](https://img.shields.io/badge/Email-lach@lazying.art-0ea5e9?style=for-the-badge&logo=gmail&logoColor=white)](mailto:lach@lazying.art)
+
+Build less. Live more.
