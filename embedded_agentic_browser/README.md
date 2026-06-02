@@ -1,6 +1,8 @@
-# Embedded AgInTi Browser
+# AgInTi Browser
 
 Alternative agentic browser implementation in a folder parallel to the previous `agentic_browser_site` webapp.
+
+Powered by AgInTi Flow: https://flow.lazying.art
 
 ## What It Does
 

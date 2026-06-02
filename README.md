@@ -6,10 +6,10 @@
   </a>
 </p>
 
-<h1 align="center">Agentic Browser</h1>
+<h1 align="center">AgInTi Browser</h1>
 
 <p align="center">
-  <strong>A local-first Chrome/CDP browser workbench for human-supervised AI browsing.</strong>
+  <strong>A local-first Chrome/CDP browser workbench for human-supervised AI browsing, powered by AgInTi Flow.</strong>
 </p>
 
 <p align="center">
@@ -20,14 +20,17 @@
 
 <p align="center">
   <a href="https://lazying.art"><img alt="Website" src="https://img.shields.io/badge/Website-lazying.art-111827?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+  <a href="https://flow.lazying.art"><img alt="AgInTi Flow" src="https://img.shields.io/badge/AgInTi%20Flow-flow.lazying.art-264f46?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
   <a href="https://github.com/lachlanchen/agentic-browser"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-agentic--browser-181717?style=for-the-badge&logo=github&logoColor=white"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="Chrome CDP" src="https://img.shields.io/badge/Chrome-CDP-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white">
 </p>
 
-Agentic Browser is a practical browser automation tool built around real Chrome or Chromium, Chrome DevTools Protocol, and a Codex-compatible command wrapper. It gives the human a visible webapp, a clickable screenshot viewport, DOM observations, a CLI, tmux-friendly service management, and an autonomous surfing loop where every step is bounded and logged.
+AgInTi Browser is a practical browser automation tool built around real Chrome or Chromium, Chrome DevTools Protocol, and a Codex-compatible command wrapper. It gives the human a visible webapp, a clickable screenshot viewport, DOM observations, a CLI, tmux-friendly service management, and an autonomous surfing loop where every step is bounded and logged.
 
 It is not a browser engine from scratch. It is a controlled browser workbench: real websites run inside real Chrome, while the local app observes screenshots and DOM state, asks an agent for one action, enforces safety rules, and executes that action through CDP.
+
+AgInTi Browser acknowledges and is powered by [AgInTi Flow](https://flow.lazying.art), an agentic workflow system from [LazyingArt LLC](https://lazying.art).
 
 ## What It Does
 
@@ -152,7 +155,13 @@ Current copied validation from the source workspace:
 
 ## Project Lineage
 
-This repo was extracted from a book/workflow automation workspace into a standalone Agentic Browser project. Future Agentic Browser development should happen here, not inside the Books repo.
+This repo was extracted from a book/workflow automation workspace into a standalone AgInTi Browser project. Future AgInTi Browser development should happen here, not inside the Books repo.
+
+AgInTi Browser is part of the LazyingArt LLC agentic tooling family and acknowledges AgInTi Flow as its workflow foundation:
+
+- AgInTi Flow: https://flow.lazying.art
+- LazyingArt LLC: https://lazying.art
+- GitHub: https://github.com/lachlanchen
 
 ## Support
 

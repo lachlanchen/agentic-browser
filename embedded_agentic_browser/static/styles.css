@@ -130,6 +130,16 @@ h3 {
   font-size: 19px;
 }
 
+a {
+  color: var(--accent-2);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .panel,
 .status-card {
   border: 1px solid var(--line);
@@ -455,6 +465,21 @@ h3 {
 .event-log {
   max-height: 360px;
   overflow: auto;
+}
+
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  padding: 24px 0 0;
+  font-size: 14px;
+}
+
+.app-footer strong {
+  color: var(--ink);
 }
 
 .log-item {
