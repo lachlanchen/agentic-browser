@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embedded AgInTi Browser</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Open Chrome + CDP + Codex Exec</p>
+        <h1>Embedded AgInTi Browser</h1>
+        <p class="subhead">A real browser viewport with manual controls, one-step Codex steering, guarded navigation, and bounded autopilot.</p>
+      </div>
+      <aside class="status-card">
+        <span id="chromeStatus" class="pill">checking</span>
+        <strong id="browserPort">Chrome</strong>
+        <small id="modelInfo">Codex wrapper</small>
+        <small id="logPath">Action log</small>
+      </aside>
+    </header>
+
+    <section class="panel command-panel">
+      <div class="panel-head">
+        <h2>Mission</h2>
+        <p>Codex proposes one action at a time. You can execute the decision manually or run a capped autopilot loop.</p>
+      </div>
+      <div class="task-row">
+        <input id="bookTaskInput" type="text" value="Pride and Prejudice Jane Austen" placeholder="Book title and author, e.g. Pride and Prejudice Jane Austen">
+        <select id="bookTaskSource">
+          <option value="libgen">LibGen search only</option>
+        </select>
+        <button id="runBookTaskBtn">Run Book Task</button>
+        <button id="libgenInspectBtn" class="secondary">LibGen Inspect to Links</button>
+      </div>
+      <p class="hint">LibGen task finish means selected/held candidate or links-page inspection. The agent is blocked from mirror/download/direct-file pages.</p>
+      <textarea id="goalInput" rows="4">Find the best valid book or source page. Prefer exact title, author, language, and complete work. Stop before shadow-library mirror/download/direct-file pages.</textarea>
+      <div class="agent-row">
+        <button id="agentStepBtn">Codex Step</button>
+        <button id="executeDecisionBtn" class="secondary">Execute Last Decision</button>
+        <label>Steps <input id="maxStepsInput" type="number" min="1" max="8" value="3"></label>
+        <button id="autopilotBtn" class="secondary">Bounded Autopilot</button>
+      </div>
+      <div class="autonomous-card">
+        <div class="panel-head row">
+          <div>
+            <h3>Autonomous Surf</h3>
+            <p>Runs the true browser agent: plan first, then one Codex exec decision per browser step.</p>
+          </div>
+          <span id="autonomousStatus" class="pill">idle</span>
+        </div>
+        <div class="autonomous-row">
+          <input id="autonomousStartUrl" type="url" value="https://www.gutenberg.org/ebooks/1342" placeholder="Optional start URL, or leave blank to use selected tab">
+          <button id="autonomousRunBtn">Run Autonomous Surf</button>
+        </div>
+        <p class="hint">Public-domain downloads are allowed. Shadow-library mirror/download/direct-file URLs remain blocked.</p>
+        <pre id="autonomousBox" class="plan-box">No autonomous run yet.</pre>
+      </div>
+      <pre id="decisionBox" class="decision-box">No decision yet.</pre>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Open</h2>
+        <p>Regular open is for user-driven exploration. Guarded open blocks unsafe download/mirror/direct-file URLs.</p>
+      </div>
+      <div class="open-row">
+        <input id="urlInput" type="url" placeholder="https://libgen.pw/search?query=Gone+with+the+Wind&collection=libgen">
+        <button id="openBtn">Open</button>
+        <button id="guardedOpenBtn" class="secondary">Guarded Open</button>
+      </div>
+      <div class="quick-grid">
+        <button data-url="https://libgen.pw/search?query=Gone+with+the+Wind&collection=libgen">LibGen Search: Gone With the Wind</button>
+        <button data-url="https://zh.wikisource.org/wiki/%E5%8F%B2%E8%A8%98">Wikisource: 史記</button>
+        <button data-url="https://www.aozora.gr.jp/index_pages/person879.html">Aozora: 司馬遷</button>
+        <button data-url="https://ctext.org/shiji/zh">Chinese Text Project: 史記</button>
+        <button data-url="https://www.figma.com/">Figma</button>
+        <button data-url="https://www.biorender.com/">BioRender</button>
+      </div>
+    </section>
+
+    <section class="workbench">
+      <section class="panel browser-panel">
+        <div class="panel-head row">
+          <div>
+            <h2>Embedded Viewport</h2>
+            <p>Screenshot-backed Chrome viewport. Click inside it to send a real browser click.</p>
+          </div>
+          <div class="viewport-actions">
+            <button id="captureBtn" class="secondary">Capture</button>
+            <button id="backBtn" class="secondary">Back</button>
+            <button id="forwardBtn" class="secondary">Forward</button>
+            <button id="reloadBtn" class="secondary">Reload</button>
+            <button id="scrollUpBtn" class="secondary">Up</button>
+            <button id="scrollDownBtn" class="secondary">Down</button>
+          </div>
+        </div>
+        <div id="viewportMeta" class="viewport-meta">No viewport captured.</div>
+        <div class="type-row">
+          <input id="typeInput" type="text" placeholder="Text to type into focused page element">
+          <button id="typeBtn" class="secondary">Type</button>
+          <button id="enterBtn" class="secondary">Enter</button>
+        </div>
+        <div class="viewport-frame">
+          <img id="viewportImage" alt="Controlled browser viewport">
+          <div id="viewportEmpty" class="viewport-empty">Capture a selected tab.</div>
+        </div>
+      </section>
+
+      <aside class="side-stack">
+        <section class="panel">
+          <div class="panel-head row">
+            <div>
+              <h2>Tabs</h2>
+              <p>Select which tab the agent controls.</p>
+            </div>
+            <button id="refreshTabsBtn" class="secondary">Refresh</button>
+          </div>
+          <div id="tabsList" class="tabs-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head row">
+            <div>
+              <h2>Observation</h2>
+              <p id="snapshotMeta">No page observed.</p>
+            </div>
+            <button id="inspectBtn" class="secondary">Observe</button>
+          </div>
+          <div id="policyBox" class="policy-box"></div>
+          <h3>Interactive Elements</h3>
+          <div id="interactiveList" class="mini-list"></div>
+          <h3>Cards</h3>
+          <div id="cardsList" class="mini-list"></div>
+          <h3>Download-looking Links</h3>
+          <div id="linksList" class="mini-list"></div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Visible Text</h2>
+      </div>
+      <pre id="textSample" class="sample-box"></pre>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Live Log</h2>
+      </div>
+      <div id="eventLog" class="event-log"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
