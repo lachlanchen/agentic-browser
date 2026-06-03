@@ -44,7 +44,36 @@ npm install --prefix /tmp/aginti-browser-npm-test ./lazyingart-aginti-browser-*.
 rm -f ./lazyingart-aginti-browser-*.tgz
 ```
 
-## Publish
+## Trusted Publishing
+
+Prefer GitHub Actions trusted publishing for repeat releases. This is the same
+method used by `../AgenticApp`: npm trusts a specific GitHub workflow through
+OIDC, so GitHub can publish without a local OTP or long-lived publish token.
+
+Trusted Publisher settings on npm:
+
+- Package: `@lazyingart/aginti-browser`
+- Publisher: GitHub Actions
+- Repository: `lachlanchen/agentic-browser`
+- Workflow filename: `npm-publish.yml`
+- Environment: blank, unless a GitHub deployment environment is added later
+
+Equivalent setup command:
+
+```bash
+npm install -g npm@^11.10.0
+npm trust github @lazyingart/aginti-browser --repo lachlanchen/agentic-browser --file npm-publish.yml
+```
+
+After npm trust is configured, publish from GitHub:
+
+```bash
+gh workflow run npm-publish.yml --repo lachlanchen/agentic-browser
+```
+
+or publish by creating a GitHub release.
+
+## Local Token Publish
 
 Use the LazyingArt npm token from a trusted env file:
 
