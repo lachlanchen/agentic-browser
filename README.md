@@ -92,6 +92,8 @@ Publishing follows the same secret-handling pattern used by AAPS and AgInTi Flow
 ```bash
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env:whoami
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env
+
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/AAPS/.env npm run publish:env:whoami
 ```
 
 The publish helper creates a temporary `.npmrc`, never prints the token, and removes the temporary file after npm exits. See `docs/npm-publishing.md`.

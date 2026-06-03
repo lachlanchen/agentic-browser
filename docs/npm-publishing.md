@@ -53,6 +53,14 @@ AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run p
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env
 ```
 
+The AAPS env file can be used the same way when it has a valid LazyingArt npm
+token:
+
+```bash
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/AAPS/.env npm run publish:env:whoami
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/AAPS/.env npm run publish:env
+```
+
 After publishing:
 
 ```bash
