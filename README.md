@@ -87,13 +87,15 @@ aginti-browser --help
 agentic-browser --help
 ```
 
-Publishing follows the same secret-handling pattern used by AAPS and AgInTi Flow. Put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or point at an existing trusted env file:
+Future npm releases use GitHub trusted publishing, so local npm login, OTP, browser confirmation, and npm tokens are not needed:
 
 ```bash
-npm install -g npm@^11.10.0
-npm trust github @lazyingart/aginti-browser --repo lachlanchen/agentic-browser --file npm-publish.yml
-gh workflow run npm-publish.yml --repo lachlanchen/agentic-browser
+npm run release:npm -- patch
+```
 
+The first publish has already been bootstrapped and npm trust is configured for `lachlanchen/agentic-browser`. For local token fallback, put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or point at an existing trusted env file:
+
+```bash
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env:whoami
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env
 

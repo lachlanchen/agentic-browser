@@ -30,11 +30,12 @@
     ".env.example"
   ],
   "scripts": {
-    "check": "node --check bin/aginti-browser.js && node --check scripts/npm-publish-from-env.js && node --check scripts/postinstall.js && bash -n agentic-browser run-agentic-browser-vdesktop.sh run-embedded-agentic-browser.sh run-agentic-browser-app.sh run-true-agentic-browser.sh embedded_agentic_browser/run.sh",
+    "check": "node --check bin/aginti-browser.js && node --check scripts/npm-publish-from-env.js && node --check scripts/postinstall.js && bash -n agentic-browser run-agentic-browser-vdesktop.sh run-embedded-agentic-browser.sh run-agentic-browser-app.sh run-true-agentic-browser.sh scripts/release-npm-trusted.sh embedded_agentic_browser/run.sh",
     "test": "npm run check && python3 -m unittest discover -s embedded_agentic_browser/tests",
     "pack:dry-run": "npm pack --dry-run",
     "publish:env": "node scripts/npm-publish-from-env.js publish --access public",
     "publish:env:whoami": "node scripts/npm-publish-from-env.js whoami",
+    "release:npm": "bash scripts/release-npm-trusted.sh",
     "postinstall": "node scripts/postinstall.js"
   },
   "publishConfig": {
