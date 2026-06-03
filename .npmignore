@@ -1,0 +1,12 @@
+.git/
+.github/
+__pycache__/
+**/__pycache__/
+*.pyc
+**/*.pyc
+library/
+node_modules/
+npm-debug.log*
+.env
+.env.*
+!.env.example

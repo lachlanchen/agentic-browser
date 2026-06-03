@@ -21,6 +21,7 @@
 <p align="center">
   <a href="https://lazying.art"><img alt="Website" src="https://img.shields.io/badge/Website-lazying.art-111827?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
   <a href="https://flow.lazying.art"><img alt="AgInTi Flow" src="https://img.shields.io/badge/AgInTi%20Flow-flow.lazying.art-264f46?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/@lazyingart/aginti-browser"><img alt="npm" src="https://img.shields.io/badge/npm-%40lazyingart%2Faginti--browser-CB3837?style=for-the-badge&logo=npm&logoColor=white"></a>
   <a href="https://github.com/lachlanchen/agentic-browser"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-agentic--browser-181717?style=for-the-badge&logo=github&logoColor=white"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="Chrome CDP" src="https://img.shields.io/badge/Chrome-CDP-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white">
@@ -62,6 +63,38 @@ http://127.0.0.1:8794
 The default virtual desktop mode is visible Xephyr. The controlled Chrome opens
 target websites inside one contained virtual-desktop window, while the webapp
 also shows the same selected tab through its screenshot and DOM panels.
+
+## npm Install
+
+AgInTi Browser is packaged as `@lazyingart/aginti-browser`.
+
+```bash
+npm install -g @lazyingart/aginti-browser
+python3 -m pip install websocket-client
+aginti-browser service start
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8794
+```
+
+The npm package exposes both command names:
+
+```bash
+aginti-browser --help
+agentic-browser --help
+```
+
+Publishing follows the same secret-handling pattern used by AAPS and AgInTi Flow. Put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or point at an existing trusted env file:
+
+```bash
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env:whoami
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env
+```
+
+The publish helper creates a temporary `.npmrc`, never prints the token, and removes the temporary file after npm exits. See `docs/npm-publishing.md`.
 
 ## Main Commands
 
@@ -132,6 +165,7 @@ Core files:
 - `agentic_browser_cli.py`: terminal client and REPL.
 - `run-agentic-browser-vdesktop.sh`: tmux + virtual display launcher.
 - `docs/AGENTIC_BROWSER_GUIDE.md`: detailed implementation notes.
+- `docs/npm-publishing.md`: npm install and LazyingArt publish workflow.
 - `legacy/`: older prototype GUI kept as a reference.
 
 ## Safety Boundary
@@ -143,7 +177,9 @@ Guarded agent actions block shadow-library mirror/download/direct-file URLs and 
 ## Test
 
 ```bash
+npm test
 python3 -m unittest discover -s embedded_agentic_browser/tests
+npm pack --dry-run
 ```
 
 Current copied validation from the source workspace:

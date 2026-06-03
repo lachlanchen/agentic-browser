@@ -1,0 +1,63 @@
+# npm Publishing
+
+AgInTi Browser is published as `@lazyingart/aginti-browser`.
+
+## Install
+
+```bash
+npm install -g @lazyingart/aginti-browser
+python3 -m pip install websocket-client
+aginti-browser service start
+```
+
+The npm command is a Node wrapper around the Python CLI. It keeps the existing
+AgInTi Browser service, tmux, Chrome/CDP, Xephyr, and headless scripts intact.
+
+## Token Source
+
+The publish helper follows the same convention used by AAPS and AgInTi Flow:
+
+- Local env file: `.env`
+- Explicit env file: `AGINTI_BROWSER_NPM_ENV=/path/to/.env`
+- Accepted token keys: `NPM_TOKEN` or `NODE_AUTH_TOKEN`
+- Optional registry key: `NPM_CONFIG_REGISTRY`
+
+The helper creates a temporary npm config, runs npm, and deletes that config.
+It must not print npm tokens.
+
+## Validate
+
+```bash
+npm run check
+npm test
+npm pack --dry-run
+```
+
+For a local install smoke test:
+
+```bash
+npm pack
+rm -rf /tmp/aginti-browser-npm-test
+npm install --prefix /tmp/aginti-browser-npm-test ./lazyingart-aginti-browser-*.tgz
+/tmp/aginti-browser-npm-test/node_modules/.bin/aginti-browser --help
+/tmp/aginti-browser-npm-test/node_modules/.bin/agentic-browser --help
+rm -f ./lazyingart-aginti-browser-*.tgz
+```
+
+## Publish
+
+Use the LazyingArt npm token from a trusted env file:
+
+```bash
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env:whoami
+AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env
+```
+
+After publishing:
+
+```bash
+npm view @lazyingart/aginti-browser version
+rm -rf /tmp/aginti-browser-published-test
+npm install --prefix /tmp/aginti-browser-published-test @lazyingart/aginti-browser
+/tmp/aginti-browser-published-test/node_modules/.bin/aginti-browser --help
+```

@@ -7,6 +7,8 @@ __pycache__/
 .venv/
 venv/
 env/
+node_modules/
+*.tgz
 
 # Runtime state
 library/
@@ -21,4 +23,4 @@ downloads/
 # Local secrets/config
 .env
 .env.*
-
+!.env.example

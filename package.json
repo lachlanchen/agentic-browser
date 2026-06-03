@@ -1,0 +1,72 @@
+{
+  "name": "@lazyingart/aginti-browser",
+  "version": "0.1.0",
+  "description": "AgInTi Browser is a local-first Chrome/CDP browser workbench for human-supervised AI browsing, powered by AgInTi Flow.",
+  "type": "module",
+  "bin": {
+    "aginti-browser": "bin/aginti-browser.js",
+    "agentic-browser": "bin/aginti-browser.js"
+  },
+  "files": [
+    "README.md",
+    "requirements.txt",
+    "agentic-browser",
+    "agentic_browser_cli.py",
+    "bin/",
+    "scripts/",
+    "embedded_agentic_browser/*.py",
+    "embedded_agentic_browser/README.md",
+    "embedded_agentic_browser/run.sh",
+    "embedded_agentic_browser/static/",
+    "embedded_agentic_browser/tests/*.py",
+    "docs/",
+    "assets/agentic-browser-webapp.png",
+    "i18n/",
+    "legacy/",
+    "run-agentic-browser-app.sh",
+    "run-agentic-browser-vdesktop.sh",
+    "run-embedded-agentic-browser.sh",
+    "run-true-agentic-browser.sh",
+    ".env.example"
+  ],
+  "scripts": {
+    "check": "node --check bin/aginti-browser.js && node --check scripts/npm-publish-from-env.js && node --check scripts/postinstall.js && bash -n agentic-browser run-agentic-browser-vdesktop.sh run-embedded-agentic-browser.sh run-agentic-browser-app.sh run-true-agentic-browser.sh embedded_agentic_browser/run.sh",
+    "test": "npm run check && python3 -m unittest discover -s embedded_agentic_browser/tests",
+    "pack:dry-run": "npm pack --dry-run",
+    "publish:env": "node scripts/npm-publish-from-env.js publish --access public",
+    "publish:env:whoami": "node scripts/npm-publish-from-env.js whoami",
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lachlanchen/agentic-browser.git"
+  },
+  "homepage": "https://flow.lazying.art",
+  "bugs": {
+    "url": "https://github.com/lachlanchen/agentic-browser/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://chat.lazying.art/donate"
+  },
+  "keywords": [
+    "aginti",
+    "agintiflow",
+    "browser",
+    "browser-automation",
+    "chrome",
+    "cdp",
+    "agent",
+    "codex",
+    "local-first",
+    "web-automation"
+  ],
+  "author": "LazyingArt LLC <lach@lazying.art>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
