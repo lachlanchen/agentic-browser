@@ -58,8 +58,8 @@ git tag "$tag"
 git push origin HEAD --tags
 
 echo "Triggering trusted npm publish workflow for $tag..."
-gh workflow run npm-publish.yml --repo lachlanchen/agentic-browser --ref main
+gh workflow run npm-publish.yml --repo lachlanchen/aginti-browser --ref main
 
 echo "Release workflow triggered. Watch it with:"
-echo "  gh run list --repo lachlanchen/agentic-browser --workflow npm-publish.yml --limit 1"
-echo "  gh run watch <run-id> --repo lachlanchen/agentic-browser --exit-status"
+echo "  gh run list --repo lachlanchen/aginti-browser --workflow npm-publish.yml --limit 1"
+echo "  gh run watch <run-id> --repo lachlanchen/aginti-browser --exit-status"

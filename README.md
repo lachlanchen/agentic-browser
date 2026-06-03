@@ -22,7 +22,7 @@
   <a href="https://lazying.art"><img alt="Website" src="https://img.shields.io/badge/Website-lazying.art-111827?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
   <a href="https://flow.lazying.art"><img alt="AgInTi Flow" src="https://img.shields.io/badge/AgInTi%20Flow-flow.lazying.art-264f46?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
   <a href="https://www.npmjs.com/package/@lazyingart/aginti-browser"><img alt="npm" src="https://img.shields.io/badge/npm-%40lazyingart%2Faginti--browser-CB3837?style=for-the-badge&logo=npm&logoColor=white"></a>
-  <a href="https://github.com/lachlanchen/agentic-browser"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-agentic--browser-181717?style=for-the-badge&logo=github&logoColor=white"></a>
+  <a href="https://github.com/lachlanchen/aginti-browser"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-aginti--browser-181717?style=for-the-badge&logo=github&logoColor=white"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="Chrome CDP" src="https://img.shields.io/badge/Chrome-CDP-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white">
 </p>
@@ -48,7 +48,7 @@ AgInTi Browser acknowledges and is powered by [AgInTi Flow](https://flow.lazying
 ## Quick Start
 
 ```bash
-git clone https://github.com/lachlanchen/agentic-browser.git
+git clone https://github.com/lachlanchen/aginti-browser.git
 cd agentic-browser
 python3 -m pip install -r requirements.txt
 ./run-agentic-browser-vdesktop.sh start
@@ -93,7 +93,7 @@ Future npm releases use GitHub trusted publishing, so local npm login, OTP, brow
 npm run release:npm -- patch
 ```
 
-The first publish has already been bootstrapped and npm trust is configured for `lachlanchen/agentic-browser`. For local token fallback, put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or point at an existing trusted env file:
+The first publish has already been bootstrapped and npm trust is configured for `lachlanchen/aginti-browser`. For local token fallback, put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or point at an existing trusted env file:
 
 ```bash
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env:whoami

@@ -43,11 +43,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lachlanchen/agentic-browser.git"
+    "url": "git+https://github.com/lachlanchen/aginti-browser.git"
   },
   "homepage": "https://flow.lazying.art",
   "bugs": {
-    "url": "https://github.com/lachlanchen/agentic-browser/issues"
+    "url": "https://github.com/lachlanchen/aginti-browser/issues"
   },
   "funding": {
     "type": "individual",

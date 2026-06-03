@@ -67,7 +67,7 @@ Trusted Publisher settings on npm:
 
 - Package: `@lazyingart/aginti-browser`
 - Publisher: GitHub Actions
-- Repository: `lachlanchen/agentic-browser`
+- Repository: `lachlanchen/aginti-browser`
 - Workflow filename: `npm-publish.yml`
 - Environment: blank, unless a GitHub deployment environment is added later
 
@@ -75,13 +75,13 @@ Equivalent setup command:
 
 ```bash
 npm install -g npm@^11.10.0
-npm trust github @lazyingart/aginti-browser --repo lachlanchen/agentic-browser --file npm-publish.yml
+npm trust github @lazyingart/aginti-browser --repo lachlanchen/aginti-browser --file npm-publish.yml
 ```
 
 After npm trust is configured, publish from GitHub manually if needed:
 
 ```bash
-gh workflow run npm-publish.yml --repo lachlanchen/agentic-browser
+gh workflow run npm-publish.yml --repo lachlanchen/aginti-browser
 ```
 
 or publish by creating a GitHub release.
