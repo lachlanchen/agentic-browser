@@ -170,6 +170,71 @@ class AutopilotTests(unittest.TestCase):
         inspect.assert_called_once_with(handler.server.driver, "マーガレット ミッチェル", "pick best", "gpt-test", "low")
         send_json.assert_called_once_with(result)
 
+    def test_libgen_inspect_executes_scroll_then_select(self) -> None:
+        driver = mock.Mock()
+        driver.new_tab.return_value = Target(
+            id="target-1",
+            title="",
+            url="https://libgen.pw/search?query=x&collection=libgen",
+            websocket_url="ws://x",
+        )
+        page = mock.Mock()
+        driver.page.return_value = page
+        initial_snapshot = {
+            "url": "https://libgen.pw/search?query=x&collection=libgen",
+            "cards": [],
+            "policy": {},
+        }
+        selected_snapshot = {
+            "url": "https://libgen.pw/search?query=x&collection=libgen",
+            "cards": [
+                {
+                    "index": 0,
+                    "title": "A Concise History of Japan",
+                    "authors": ["Brett L. Walker"],
+                    "lang": "eng",
+                    "file": "epub, 0.21 MB",
+                    "file_selector": ".v-book-card__link",
+                }
+            ],
+            "policy": {},
+        }
+        with mock.patch.object(server, "wait_for_navigation", return_value=initial_snapshot), \
+             mock.patch.object(server, "wait_for_dynamic_results", side_effect=[initial_snapshot, selected_snapshot]), \
+             mock.patch.object(
+                 server,
+                 "run_codex_decision",
+                 side_effect=[
+                     {
+                         "action": "scroll",
+                         "selected_index": None,
+                         "scroll_delta_y": 700,
+                         "wait_seconds": 0,
+                         "reason": "Need visible results",
+                     },
+                     {
+                         "action": "select",
+                         "selected_index": 0,
+                         "scroll_delta_y": 0,
+                         "wait_seconds": 0,
+                         "reason": "Exact match",
+                     },
+                 ],
+             ), \
+             mock.patch.object(
+                 server,
+                 "wait_for_links_page",
+                 return_value={"url": "https://libgen.pw/links/1", "links": [], "policy": {}},
+             ), \
+             mock.patch.object(server, "append_action"):
+            result = server.open_libgen_link_inspection(driver, "x", "", "model", "low")
+
+        self.assertEqual(result["status"], "links_ready")
+        self.assertEqual(result["selected_card"]["title"], "A Concise History of Japan")
+        self.assertEqual([step["action"] for step in result["inspection_steps"]], ["scroll", "select"])
+        driver.action.assert_any_call("target-1", "scroll", {"delta_y": 700})
+        driver.action.assert_any_call("target-1", "click_selector", {"selector": ".v-book-card__link"})
+
 
 if __name__ == "__main__":
     unittest.main()

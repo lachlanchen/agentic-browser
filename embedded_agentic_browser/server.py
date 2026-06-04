@@ -410,6 +410,7 @@ def open_libgen_link_inspection(
     path = urllib.parse.urlparse(str(snapshot.get("url") or "")).path
     selected_card: dict[str, Any] | None = None
     decision: dict[str, Any] = {}
+    inspection_steps: list[dict[str, Any]] = []
 
     if path.startswith("/links"):
         links_snapshot = snapshot
@@ -424,7 +425,54 @@ def open_libgen_link_inspection(
             )
             if goal.strip():
                 inspect_goal += "\nUser task details: " + goal.strip()
-            decision = run_codex_decision(inspect_goal, snapshot, 1, model, reasoning_effort)
+            for step_index in range(1, 4):
+                decision = run_codex_decision(inspect_goal, snapshot, step_index, model, reasoning_effort)
+                action = str(decision.get("action") or "hold")
+                inspection_steps.append(
+                    {
+                        "step": step_index,
+                        "action": action,
+                        "page_url": snapshot.get("url"),
+                        "cards": len(snapshot.get("cards") or []),
+                        "reason": decision.get("reason"),
+                    }
+                )
+                if action == "select" and decision.get("selected_index") is not None:
+                    break
+                if action == "scroll":
+                    delta = int(decision.get("scroll_delta_y") or 700)
+                    driver.action(target.id, "scroll", {"delta_y": delta})
+                    time.sleep(0.7)
+                    snapshot = wait_for_dynamic_results(driver, target.id)
+                    continue
+                if action == "wait":
+                    seconds = max(0.1, min(10.0, float(decision.get("wait_seconds") or 1.0)))
+                    driver.action(target.id, "wait", {"seconds": seconds})
+                    snapshot = wait_for_dynamic_results(driver, target.id)
+                    continue
+                return {
+                    "ok": True,
+                    "status": action,
+                    "target": target_to_dict(target),
+                    "start_url": policy.url,
+                    "initial_snapshot": snapshot,
+                    "inspection_steps": inspection_steps,
+                    "decision": decision,
+                    "links_snapshot": None,
+                    "mirror_links": [],
+                }
+            else:
+                return {
+                    "ok": True,
+                    "status": "max_inspection_steps",
+                    "target": target_to_dict(target),
+                    "start_url": policy.url,
+                    "initial_snapshot": snapshot,
+                    "inspection_steps": inspection_steps,
+                    "decision": decision,
+                    "links_snapshot": None,
+                    "mirror_links": [],
+                }
             if str(decision.get("action") or "") != "select" or decision.get("selected_index") is None:
                 return {
                     "ok": True,
@@ -432,6 +480,7 @@ def open_libgen_link_inspection(
                     "target": target_to_dict(target),
                     "start_url": policy.url,
                     "initial_snapshot": snapshot,
+                    "inspection_steps": inspection_steps,
                     "decision": decision,
                     "links_snapshot": None,
                     "mirror_links": [],
@@ -488,6 +537,7 @@ def open_libgen_link_inspection(
         "target": target_to_dict(target),
         "start_url": policy.url,
         "initial_snapshot": snapshot,
+        "inspection_steps": inspection_steps,
         "decision": decision,
         "selected_card": selected_card,
         "links_snapshot": links_snapshot,
