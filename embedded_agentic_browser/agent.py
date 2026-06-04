@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import secrets
 import subprocess
 import tempfile
@@ -23,6 +24,7 @@ from embedded_agentic_browser.server import (
     DEFAULT_PROFILE_DIR,
     DEFAULT_REASONING_EFFORT,
     LOG_DIR,
+    libgen_search_url,
     policy_dict_for_url,
     wait_for_navigation,
     wait_for_dynamic_results,
@@ -178,6 +180,33 @@ Rules:
 """.strip()
 
 
+def infer_start_url_from_goal(goal: str, start_url: str) -> str:
+    explicit = (start_url or "").strip()
+    if explicit:
+        return explicit
+    text = " ".join((goal or "").split())
+    lowered = text.lower()
+    if "libgen" not in lowered:
+        return ""
+
+    patterns = [
+        r"(?:search|find|look\s+for)\s+(?:a\s+book\s+)?(?:on\s+libgen\b\s*[:：]?\s*)?(.+?)(?:\.|$)",
+        r"(?:libgen)\s+(?:for|search)\s+(.+?)(?:\.|$)",
+    ]
+    query = ""
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            query = match.group(1).strip()
+            break
+    if not query:
+        return "https://libgen.pw/search?query=&collection=libgen"
+
+    query = re.sub(r"\b(and|then|choose|select|open|stop|before|mirror|download)\b.*$", "", query, flags=re.IGNORECASE).strip()
+    query = query.strip("\"'“”‘’ ")
+    return libgen_search_url(query) if query else "https://libgen.pw/search?query=&collection=libgen"
+
+
 def run_codex_agent_plan(goal: str, start_url: str, model: str, reasoning_effort: str) -> dict[str, Any]:
     prompt = build_plan_prompt(goal, start_url)
     with tempfile.TemporaryDirectory(prefix="true-agentic-browser-plan-") as temp_dir:
@@ -264,6 +293,8 @@ Rules:
 - Use download_url only when the user explicitly asks to download and the target URL is a visible public-domain/open-source download link.
 - If the task is complete, use extract or select with concise evidence.
 - If the page is visibly loading or dynamic results are not ready, use wait.
+- If a prior action failed, use the error plus the fresh snapshot to recover safely.
+- If the goal is a LibGen book-search inspection, stop with select/hold before mirrors or direct downloads.
 
 State:
 {json.dumps(payload, ensure_ascii=False, indent=2)}
@@ -412,6 +443,14 @@ def execute_agent_action(driver: OpenChromeDriver, target_id: str, decision: dic
     return {"terminal": False, "status": "executed", "result": result}
 
 
+def final_snapshot(driver: OpenChromeDriver, target_id: str) -> dict[str, Any]:
+    try:
+        snapshot = observe(driver, target_id)
+    except Exception as exc:
+        return {"error": str(exc)}
+    return compact_snapshot(snapshot)
+
+
 def append_jsonl(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
@@ -424,11 +463,12 @@ def run_agent(config: AgentRunConfig) -> dict[str, Any]:
     driver = OpenChromeDriver(config.browser_port, config.profile_dir)
     run_id = time.strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(3)
     log_path = config.log_dir / f"{run_id}.jsonl"
+    inferred_start_url = infer_start_url_from_goal(config.goal, config.start_url)
     plan: dict[str, Any] = {"plan": [], "risk_notes": "", "done_signal": ""}
 
     if config.make_plan:
         try:
-            plan = run_codex_agent_plan(config.goal, config.start_url, config.model, config.reasoning_effort)
+            plan = run_codex_agent_plan(config.goal, inferred_start_url, config.model, config.reasoning_effort)
         except Exception as exc:
             plan = {
                 "plan": ["Continue step by step from the current browser state."],
@@ -445,8 +485,8 @@ def run_agent(config: AgentRunConfig) -> dict[str, Any]:
             },
         )
 
-    if config.start_url:
-        start_url = guard_url(config.start_url)
+    if inferred_start_url:
+        start_url = guard_url(inferred_start_url)
         target = driver.new_tab(start_url)
         target_id = target.id
         wait_for_navigation(driver, target_id, start_url)
@@ -488,7 +528,7 @@ def run_agent(config: AgentRunConfig) -> dict[str, Any]:
         try:
             execution = execute_agent_action(driver, target_id, decision, config.download_dir)
         except Exception as exc:
-            execution = {"terminal": True, "status": "error", "error": str(exc)}
+            execution = {"terminal": False, "status": "recoverable_error", "error": str(exc)}
         record = {
             "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "run_id": run_id,
@@ -504,6 +544,12 @@ def run_agent(config: AgentRunConfig) -> dict[str, Any]:
         if execution.get("terminal") or decision.get("safety_stop"):
             final_status = str(execution.get("status") or decision.get("action") or "stop")
             break
+        if execution.get("status") == "recoverable_error":
+            if step_index >= max(1, config.max_steps):
+                final_status = "error"
+                break
+            time.sleep(1.0)
+            continue
         time.sleep(0.8)
 
     summary = {
@@ -515,8 +561,10 @@ def run_agent(config: AgentRunConfig) -> dict[str, Any]:
         "duration_seconds": round(time.time() - started, 2),
         "log_path": str(log_path),
         "plan": plan,
+        "inferred_start_url": inferred_start_url,
         "step_records": history,
         "final_decision": final_decision,
+        "final_snapshot": final_snapshot(driver, target_id),
     }
     append_jsonl(log_path, {"created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "run_id": run_id, "summary": summary})
     return summary

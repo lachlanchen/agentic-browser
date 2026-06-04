@@ -97,6 +97,22 @@ class AgentExecutionTests(unittest.TestCase):
         self.assertFalse(result["terminal"])
         driver.action.assert_called_once()
 
+    def test_infer_libgen_start_url_from_goal(self) -> None:
+        url = agent.infer_start_url_from_goal(
+            "Search a book on LibGen: A Concise History of Japan Brett Walker and choose the best candidate.",
+            "",
+        )
+        self.assertEqual(
+            url,
+            "https://libgen.pw/search?query=A%20Concise%20History%20of%20Japan%20Brett%20Walker&collection=libgen",
+        )
+
+    def test_explicit_start_url_overrides_goal_inference(self) -> None:
+        self.assertEqual(
+            agent.infer_start_url_from_goal("Search a book on LibGen: Kokoro", "https://example.com"),
+            "https://example.com",
+        )
+
 
 class AgentPromptTests(unittest.TestCase):
     def test_prompt_includes_interactive_selectors(self) -> None:
@@ -137,6 +153,81 @@ class AgentPromptTests(unittest.TestCase):
         prompt = agent.build_plan_prompt("download Pride and Prejudice", "https://www.gutenberg.org/ebooks/1342")
         self.assertIn("download Pride and Prejudice", prompt)
         self.assertIn("how the agent should know it is done", prompt)
+
+
+class AgentRunTests(unittest.TestCase):
+    def test_run_agent_recovers_after_action_error(self) -> None:
+        driver = mock.Mock()
+        driver.new_tab.return_value = mock.Mock(id="target-1")
+        snapshots = [
+            {"target_id": "target-1", "url": "https://example.com", "title": "Example", "policy": {}, "interactive": []},
+            {"target_id": "target-1", "url": "https://example.com", "title": "Example", "policy": {}, "interactive": []},
+        ]
+        decisions = [
+            {
+                "action": "click_selector",
+                "selector": "#missing",
+                "text": "",
+                "url": "",
+                "key": "",
+                "filename": "",
+                "scroll_delta_y": 0,
+                "wait_seconds": 0,
+                "clear_first": True,
+                "selected_index": None,
+                "selected_title": "",
+                "selected_author": "",
+                "selected_language": "",
+                "extracted_answer": "",
+                "safety_stop": False,
+                "reason": "Try click",
+            },
+            {
+                "action": "extract",
+                "selector": "",
+                "text": "",
+                "url": "",
+                "key": "",
+                "filename": "",
+                "scroll_delta_y": 0,
+                "wait_seconds": 0,
+                "clear_first": False,
+                "selected_index": None,
+                "selected_title": "",
+                "selected_author": "",
+                "selected_language": "",
+                "extracted_answer": "Recovered",
+                "safety_stop": False,
+                "reason": "Recovered by observing again",
+            },
+        ]
+
+        with mock.patch.object(agent, "OpenChromeDriver", return_value=driver), \
+             mock.patch.object(agent, "wait_for_navigation"), \
+             mock.patch.object(agent, "observe", side_effect=[snapshots[0], snapshots[1], snapshots[1]]), \
+             mock.patch.object(agent, "run_codex_agent_decision", side_effect=decisions), \
+             mock.patch.object(agent, "execute_agent_action", side_effect=[Exception("missing selector"), {"terminal": True, "status": "extract"}]), \
+             mock.patch.object(agent, "run_codex_agent_plan", return_value={"plan": [], "risk_notes": "", "done_signal": ""}):
+            summary = agent.run_agent(
+                agent.AgentRunConfig(
+                    goal="extract title",
+                    start_url="https://example.com",
+                    target_id=None,
+                    max_steps=2,
+                    model="model",
+                    reasoning_effort="low",
+                    browser_port=9333,
+                    profile_dir=agent.DEFAULT_PROFILE_DIR,
+                    log_dir=agent.LOG_DIR / "test-runs",
+                    download_dir=agent.DEFAULT_DOWNLOAD_DIR,
+                    make_plan=True,
+                )
+            )
+
+        self.assertTrue(summary["ok"])
+        self.assertEqual(summary["status"], "extract")
+        self.assertEqual(summary["step_records"][0]["execution"]["status"], "recoverable_error")
+        self.assertEqual(summary["steps"], 2)
 
 
 if __name__ == "__main__":
