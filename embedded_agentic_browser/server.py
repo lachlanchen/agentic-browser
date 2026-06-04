@@ -388,6 +388,20 @@ def classify_snapshot_links(links: list[dict[str, Any]]) -> list[dict[str, Any]]
     return classified
 
 
+def stable_browser_selector(selector: str) -> str:
+    value = selector.strip()
+    for transition_class in (
+        ".fade-enter-active",
+        ".fade-enter-from",
+        ".fade-enter-to",
+        ".fade-leave-active",
+        ".fade-leave-from",
+        ".fade-leave-to",
+    ):
+        value = value.replace(transition_class, "")
+    return value
+
+
 def open_libgen_link_inspection(
     driver: OpenChromeDriver,
     query_or_url: str,
@@ -490,7 +504,7 @@ def open_libgen_link_inspection(
             if selected_index < 0 or selected_index >= len(cards):
                 raise EmbeddedBrowserError(f"Selected card index out of range: {selected_index}")
             selected_card = dict(cards[selected_index])
-            selector = str(selected_card.get("file_selector") or "")
+            selector = stable_browser_selector(str(selected_card.get("file_selector") or ""))
             if not selector:
                 raise EmbeddedBrowserError("Selected card does not expose a file selector")
             driver.action(target.id, "click_selector", {"selector": selector})
@@ -500,11 +514,11 @@ def open_libgen_link_inspection(
             selector = ""
             if cards:
                 selected_card = dict(cards[0])
-                selector = str(selected_card.get("file_selector") or "")
+                selector = stable_browser_selector(str(selected_card.get("file_selector") or ""))
             if not selector:
                 for element in snapshot.get("interactive") or []:
                     if "v-book-card__link" in str(element.get("selector") or ""):
-                        selector = str(element.get("selector") or "")
+                        selector = stable_browser_selector(str(element.get("selector") or ""))
                         break
             if not selector:
                 book_id = path.rstrip("/").split("/")[-1]

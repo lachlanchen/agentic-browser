@@ -226,11 +226,14 @@ class OpenChromeDriver:
   };
   const cssPath = (el) => {
     if (el.id) return `#${esc(el.id)}`;
+    const stableClasses = (node) => [...node.classList]
+      .filter(c => !/^fade-(enter|leave)-/.test(c))
+      .slice(0, 2);
     const parts = [];
     let node = el;
     while (node && node.nodeType === Node.ELEMENT_NODE && parts.length < 5) {
       let part = node.tagName.toLowerCase();
-      const classes = [...node.classList].slice(0, 2).map(c => `.${esc(c)}`).join("");
+      const classes = stableClasses(node).map(c => `.${esc(c)}`).join("");
       if (classes) part += classes;
       const parent = node.parentElement;
       if (parent) {

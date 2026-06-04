@@ -32,6 +32,13 @@ class ServerPolicyTests(unittest.TestCase):
         actual = "https://libgen.pw/search?query=Pride+and+Prejudice&collection=libgen"
         self.assertTrue(server.is_expected_navigation(actual, expected))
 
+    def test_stable_browser_selector_removes_vue_transition_classes(self) -> None:
+        selector = "div.v-books-list.fade-enter-active:nth-of-type(2) > div.v-book-card:nth-of-type(3)"
+        self.assertEqual(
+            server.stable_browser_selector(selector),
+            "div.v-books-list:nth-of-type(2) > div.v-book-card:nth-of-type(3)",
+        )
+
 
 class AutopilotTests(unittest.TestCase):
     def test_autopilot_stops_on_select(self) -> None:
