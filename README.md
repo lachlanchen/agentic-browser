@@ -111,6 +111,7 @@ Trusted publishing is preferred for repeat releases because it avoids local OTPs
 ./agentic-browser open --guarded https://example.com
 ./agentic-browser observe
 ./agentic-browser goal --start-url https://example.com --max-steps 4 "Extract the visible page title and stop."
+./agentic-browser goal --max-steps 6 "Search a book on LibGen: A Concise History of Japan Brett Walker. Choose the best English candidate and stop before any mirror or download page."
 ./agentic-browser chat
 ```
 

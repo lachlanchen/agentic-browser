@@ -120,8 +120,19 @@ def autonomous_summary(data: dict[str, Any]) -> str:
     final = data.get("final_decision") or {}
     if final:
         lines.append(f"final: {final.get('action')} - {final.get('reason')}")
+        if final.get("selected_title"):
+            selected = final.get("selected_title")
+            author = final.get("selected_author")
+            language = final.get("selected_language")
+            details = " | ".join(x for x in [author, language] if x)
+            lines.append(f"selected: {selected}" + (f" | {details}" if details else ""))
+        if final.get("extracted_answer"):
+            lines.append(f"answer: {compact(final.get('extracted_answer'), 180)}")
         if final.get("url"):
             lines.append(f"url: {final.get('url')}")
+    final_page = ((data.get("final_snapshot") or {}).get("page") or {})
+    if final_page.get("url"):
+        lines.append(f"final page: {compact(final_page.get('url'), 120)}")
     last = (data.get("step_records") or [{}])[-1].get("execution") or {}
     if last:
         lines.append(f"execution: {last.get('status')}")

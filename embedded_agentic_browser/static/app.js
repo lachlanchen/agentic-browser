@@ -432,6 +432,8 @@ async function runAutopilot() {
 function renderAutonomousRun(data) {
   state.lastAutonomousRun = data;
   const plan = data.plan || {};
+  const final = data.final_decision || {};
+  const finalPage = data.final_snapshot?.page || {};
   const planLines = (plan.plan || []).map((item, index) => `${index + 1}. ${item}`);
   const stepLines = (data.step_records || []).map((record) => {
     const decision = record.decision || {};
@@ -448,6 +450,11 @@ function renderAutonomousRun(data) {
     `run: ${data.run_id}`,
     `steps: ${data.steps}`,
     `log: ${data.log_path}`,
+    data.inferred_start_url ? `start: ${data.inferred_start_url}` : "",
+    final.selected_title ? `selected: ${final.selected_title}${final.selected_author ? ` | ${final.selected_author}` : ""}${final.selected_language ? ` | ${final.selected_language}` : ""}` : "",
+    final.extracted_answer ? `answer: ${final.extracted_answer}` : "",
+    final.reason ? `final reason: ${final.reason}` : "",
+    finalPage.url ? `final page: ${finalPage.url}` : "",
     "",
     "plan:",
     ...(planLines.length ? planLines : ["(no plan returned)"]),

@@ -48,6 +48,30 @@ class CliFormattingTests(unittest.TestCase):
         self.assertEqual(command, "start-url")
         self.assertEqual(values, ["https://example.com", "get title"])
 
+    def test_autonomous_summary_includes_selected_result(self) -> None:
+        text = cli.autonomous_summary(
+            {
+                "status": "select",
+                "run_id": "run-1",
+                "steps": 1,
+                "target_id": "target-1",
+                "log_path": "/tmp/run.jsonl",
+                "final_decision": {
+                    "action": "select",
+                    "reason": "Exact match",
+                    "selected_title": "A Concise History of Japan",
+                    "selected_author": "Brett L. Walker",
+                    "selected_language": "eng",
+                    "extracted_answer": "Best English candidate found.",
+                },
+                "final_snapshot": {"page": {"url": "https://libgen.pw/search?query=x"}},
+                "step_records": [{"execution": {"status": "select"}}],
+            }
+        )
+        self.assertIn("selected: A Concise History of Japan", text)
+        self.assertIn("Brett L. Walker", text)
+        self.assertIn("final page:", text)
+
 
 class CliCommandTests(unittest.TestCase):
     def test_goal_command_posts_autonomous_run(self) -> None:

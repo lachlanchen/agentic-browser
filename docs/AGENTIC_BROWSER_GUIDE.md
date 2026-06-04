@@ -175,6 +175,12 @@ Autonomous Surf:
 - Uses `embedded_agentic_browser/agent.py`.
 - First asks Codex for a concise plan.
 - Then each step asks Codex for one browser action.
+- If no start URL is provided and the goal mentions LibGen, it can infer a safe
+  LibGen search URL from the natural-language goal.
+- Waits for dynamic search result cards before asking Codex to select.
+- Treats action failures as recoverable when more steps remain: logs the error,
+  re-observes the browser, and asks Codex for the next safe step.
+- Returns a final snapshot, selected/extracted result, step log path, and plan.
 - Supports `open_url`, `click_selector`, `click_text`, `type_selector`, `key`,
   `scroll`, `wait`, `download_url`, `extract`, `select`, `hold`, `stop`.
 - Downloads only through the guarded public-domain downloader.
@@ -209,6 +215,7 @@ One-shot commands:
 ./agentic-browser observe
 ./agentic-browser open --guarded https://example.com
 ./agentic-browser goal --start-url https://example.com --max-steps 4 "Extract the visible page title and stop."
+./agentic-browser goal --max-steps 6 "Search a book on LibGen: A Concise History of Japan Brett Walker. Choose the best English candidate and stop before any mirror or download page."
 ./agentic-browser libgen "https://libgen.pw/book/112502936"
 ./agentic-browser download "https://www.gutenberg.org/ebooks/1342.txt.utf-8"
 ./agentic-browser service status
