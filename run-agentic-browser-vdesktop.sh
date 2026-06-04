@@ -103,6 +103,40 @@ kill_profile_processes() {
   fi
 }
 
+kill_display_processes() {
+  local display="$1"
+  local display_num="${display#:}"
+  local pids
+  pids="$(pgrep -af "(Xephyr|Xvfb) ${display}( |$)" | awk -v self="$$" '$1 != self {print $1}' || true)"
+  if [[ -n "$pids" ]]; then
+    # shellcheck disable=SC2086
+    kill $pids >/dev/null 2>&1 || true
+    sleep 1
+    # shellcheck disable=SC2086
+    kill -9 $pids >/dev/null 2>&1 || true
+  fi
+  if [[ -n "$display_num" ]]; then
+    rm -f "/tmp/.X${display_num}-lock" "/tmp/.X11-unix/X${display_num}" >/dev/null 2>&1 || true
+  fi
+}
+
+wait_for_service() {
+  local url="http://127.0.0.1:$GUI_PORT/api/status"
+  if ! have curl; then
+    sleep 2
+    return 0
+  fi
+  for _ in $(seq 1 40); do
+    if curl -fsS "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  echo "Service did not become ready: $url" >&2
+  "$0" logs >&2 || true
+  return 1
+}
+
 daemon() {
   mkdir -p "$LOG_DIR"
   local selected_mode
@@ -125,6 +159,7 @@ daemon() {
         echo "Xvfb is not installed. Install it or use AGENTIC_VDESKTOP_MODE=xephyr/headless." >&2
         exit 1
       fi
+      kill_display_processes "$DISPLAY_ID"
       Xvfb "$DISPLAY_ID" -screen 0 "${GEOMETRY}x24" -nolisten tcp >>"$LOG_DIR/xserver.log" 2>&1 &
       x_pid="$!"
       export DISPLAY="$DISPLAY_ID"
@@ -136,6 +171,7 @@ daemon() {
         echo "Xephyr is not installed. Install it or use AGENTIC_VDESKTOP_MODE=headless." >&2
         exit 1
       fi
+      kill_display_processes "$DISPLAY_ID"
       Xephyr "$DISPLAY_ID" -screen "${GEOMETRY}x${XEPHYR_DEPTH}" -resizeable -title "Agentic Browser Virtual Desktop" -nolisten tcp >>"$LOG_DIR/xserver.log" 2>&1 &
       x_pid="$!"
       export DISPLAY="$DISPLAY_ID"
@@ -189,7 +225,7 @@ start() {
     'AGENTIC_VDESKTOP_SESSION=%q AGENTIC_VDESKTOP_MODE=%q AGENTIC_VDESKTOP_DISPLAY=%q AGENTIC_VDESKTOP_GEOMETRY=%q AGENTIC_VDESKTOP_XEPHYR_DEPTH=%q AGENTIC_VDESKTOP_GUI_PORT=%q AGENTIC_VDESKTOP_BROWSER_PORT=%q AGENTIC_VDESKTOP_PROFILE=%q AGENTIC_VDESKTOP_MODEL=%q AGENTIC_VDESKTOP_REASONING=%q %q daemon' \
     "$SESSION" "$MODE" "$DISPLAY_ID" "$GEOMETRY" "$XEPHYR_DEPTH" "$GUI_PORT" "$BROWSER_PORT" "$PROFILE_DIR" "$MODEL" "$REASONING" "$0"
   tmux new-session -d -s "$SESSION" "$command"
-  sleep 2
+  wait_for_service
   "$0" status
 }
 
@@ -197,6 +233,7 @@ stop() {
   load_state
   tmux kill-session -t "$SESSION" >/dev/null 2>&1 || true
   kill_profile_processes
+  kill_display_processes "$DISPLAY_ID"
   rm -f "$STATE_FILE"
   echo "Stopped session: $SESSION"
 }
