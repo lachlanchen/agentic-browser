@@ -190,10 +190,9 @@ def wait_for_navigation(
 def needs_dynamic_result_wait(snapshot: dict[str, Any]) -> bool:
     url = str(snapshot.get("url") or "")
     policy = snapshot.get("policy") or {}
-    text = "\n".join(snapshot.get("textSample") or [])
     has_results = bool(snapshot.get("cards")) or bool(snapshot.get("downloadish")) or bool(snapshot.get("noResults"))
-    is_shell = "Libgen" in text and "Search" in text and not has_results
-    return bool(policy.get("is_shadow_library")) and "/search" in urllib.parse.urlparse(url).path and is_shell
+    path = urllib.parse.urlparse(url).path
+    return bool(policy.get("is_shadow_library")) and "/search" in path and not has_results
 
 
 def wait_for_dynamic_results(

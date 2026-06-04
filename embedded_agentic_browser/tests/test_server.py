@@ -32,6 +32,33 @@ class ServerPolicyTests(unittest.TestCase):
         actual = "https://libgen.pw/search?query=Pride+and+Prejudice&collection=libgen"
         self.assertTrue(server.is_expected_navigation(actual, expected))
 
+    def test_shadow_search_without_results_waits_for_dynamic_cards(self) -> None:
+        self.assertTrue(
+            server.needs_dynamic_result_wait(
+                {
+                    "url": "https://libgen.pw/search?query=x&collection=libgen",
+                    "policy": {"is_shadow_library": True},
+                    "cards": [],
+                    "downloadish": [],
+                    "noResults": False,
+                    "textSample": ["Libgen"],
+                }
+            )
+        )
+
+    def test_shadow_search_with_cards_is_ready(self) -> None:
+        self.assertFalse(
+            server.needs_dynamic_result_wait(
+                {
+                    "url": "https://libgen.pw/search?query=x&collection=libgen",
+                    "policy": {"is_shadow_library": True},
+                    "cards": [{"title": "Book"}],
+                    "downloadish": [],
+                    "noResults": False,
+                }
+            )
+        )
+
     def test_stable_browser_selector_removes_vue_transition_classes(self) -> None:
         selector = "div.v-books-list.fade-enter-active:nth-of-type(2) > div.v-book-card:nth-of-type(3)"
         self.assertEqual(
