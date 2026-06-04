@@ -562,8 +562,10 @@ Current machine status observed during setup:
 - `google-chrome` is installed.
 - `Xvfb`, `x11vnc`, `websockify`, `noVNC`, `openbox`, and `fluxbox` were not
   installed.
-- This Xephyr build accepts `AGENTIC_VDESKTOP_XEPHYR_DEPTH=16/16`; 24/32-bit
-  screen depths failed during validation.
+- This Xephyr build needs glamor for high-color nested rendering under XRDP.
+  The launcher now defaults to `AGENTIC_VDESKTOP_XEPHYR_DEPTH=24` with
+  `AGENTIC_VDESKTOP_XEPHYR_EXTRA_ARGS=-glamor`, and falls back to `16/16` only
+  if the high-color server fails to start.
 
 Recommended modes:
 
@@ -593,7 +595,8 @@ Custom Xephyr depth:
 
 ```bash
 AGENTIC_VDESKTOP_MODE=xephyr \
-AGENTIC_VDESKTOP_XEPHYR_DEPTH=16/16 \
+AGENTIC_VDESKTOP_XEPHYR_DEPTH=24 \
+AGENTIC_VDESKTOP_XEPHYR_EXTRA_ARGS=-glamor \
 ./run-agentic-browser-vdesktop.sh start
 ```
 

@@ -8,7 +8,9 @@ SESSION="${AGENTIC_VDESKTOP_SESSION:-agentic-browser-vdesktop}"
 MODE="${AGENTIC_VDESKTOP_MODE:-xephyr}"
 DISPLAY_ID="${AGENTIC_VDESKTOP_DISPLAY:-:78}"
 GEOMETRY="${AGENTIC_VDESKTOP_GEOMETRY:-1600x1000}"
-XEPHYR_DEPTH="${AGENTIC_VDESKTOP_XEPHYR_DEPTH:-16/16}"
+XEPHYR_DEPTH="${AGENTIC_VDESKTOP_XEPHYR_DEPTH:-24}"
+XEPHYR_FALLBACK_DEPTH="${AGENTIC_VDESKTOP_XEPHYR_FALLBACK_DEPTH:-16/16}"
+XEPHYR_EXTRA_ARGS="${AGENTIC_VDESKTOP_XEPHYR_EXTRA_ARGS:--glamor}"
 GUI_PORT="${AGENTIC_VDESKTOP_GUI_PORT:-8794}"
 BROWSER_PORT="${AGENTIC_VDESKTOP_BROWSER_PORT:-9344}"
 PROFILE_DIR="${AGENTIC_VDESKTOP_PROFILE:-$HOME/.cache/agentic-browser-vdesktop-chrome}"
@@ -29,6 +31,8 @@ Environment overrides:
   AGENTIC_VDESKTOP_DISPLAY=$DISPLAY_ID
   AGENTIC_VDESKTOP_GEOMETRY=$GEOMETRY
   AGENTIC_VDESKTOP_XEPHYR_DEPTH=$XEPHYR_DEPTH
+  AGENTIC_VDESKTOP_XEPHYR_FALLBACK_DEPTH=$XEPHYR_FALLBACK_DEPTH
+  AGENTIC_VDESKTOP_XEPHYR_EXTRA_ARGS=$XEPHYR_EXTRA_ARGS
   AGENTIC_VDESKTOP_GUI_PORT=$GUI_PORT
   AGENTIC_VDESKTOP_BROWSER_PORT=$BROWSER_PORT
   AGENTIC_VDESKTOP_PROFILE=$PROFILE_DIR
@@ -49,6 +53,8 @@ write_state() {
     printf 'DISPLAY_ID=%q\n' "$DISPLAY_ID"
     printf 'GEOMETRY=%q\n' "$GEOMETRY"
     printf 'XEPHYR_DEPTH=%q\n' "$XEPHYR_DEPTH"
+    printf 'XEPHYR_FALLBACK_DEPTH=%q\n' "$XEPHYR_FALLBACK_DEPTH"
+    printf 'XEPHYR_EXTRA_ARGS=%q\n' "$XEPHYR_EXTRA_ARGS"
     printf 'GUI_PORT=%q\n' "$GUI_PORT"
     printf 'BROWSER_PORT=%q\n' "$BROWSER_PORT"
     printf 'PROFILE_DIR=%q\n' "$PROFILE_DIR"
@@ -137,6 +143,27 @@ wait_for_service() {
   return 1
 }
 
+start_xephyr() {
+  local depth="$1"
+  shift
+  local -a extra_args=("$@")
+  Xephyr "$DISPLAY_ID" \
+    -screen "${GEOMETRY}x${depth}" \
+    "${extra_args[@]}" \
+    -resizeable \
+    -title "Agentic Browser Virtual Desktop" \
+    -nolisten tcp \
+    >>"$LOG_DIR/xserver.log" 2>&1 &
+  x_pid="$!"
+  sleep 1
+  if ps -p "$x_pid" >/dev/null 2>&1; then
+    return 0
+  fi
+  wait "$x_pid" >/dev/null 2>&1 || true
+  x_pid=""
+  return 1
+}
+
 daemon() {
   mkdir -p "$LOG_DIR"
   local selected_mode
@@ -172,10 +199,19 @@ daemon() {
         exit 1
       fi
       kill_display_processes "$DISPLAY_ID"
-      Xephyr "$DISPLAY_ID" -screen "${GEOMETRY}x${XEPHYR_DEPTH}" -resizeable -title "Agentic Browser Virtual Desktop" -nolisten tcp >>"$LOG_DIR/xserver.log" 2>&1 &
-      x_pid="$!"
+      # 24-bit Xephyr needs glamor in some XRDP/Xvnc sessions. Fall back to the
+      # older 16-bit mode only if the high-color launch fails.
+      # shellcheck disable=SC2206
+      local xephyr_extra_args=( $XEPHYR_EXTRA_ARGS )
+      if ! start_xephyr "$XEPHYR_DEPTH" "${xephyr_extra_args[@]}"; then
+        echo "Xephyr ${GEOMETRY}x${XEPHYR_DEPTH} failed; retrying ${GEOMETRY}x${XEPHYR_FALLBACK_DEPTH}" >>"$LOG_DIR/xserver.log"
+        kill_display_processes "$DISPLAY_ID"
+        start_xephyr "$XEPHYR_FALLBACK_DEPTH" || {
+          echo "Xephyr failed to start. See $LOG_DIR/xserver.log" >&2
+          exit 1
+        }
+      fi
       export DISPLAY="$DISPLAY_ID"
-      sleep 1
       start_window_manager
       ;;
     headless)
@@ -222,8 +258,8 @@ start() {
   write_state
   local command
   printf -v command \
-    'AGENTIC_VDESKTOP_SESSION=%q AGENTIC_VDESKTOP_MODE=%q AGENTIC_VDESKTOP_DISPLAY=%q AGENTIC_VDESKTOP_GEOMETRY=%q AGENTIC_VDESKTOP_XEPHYR_DEPTH=%q AGENTIC_VDESKTOP_GUI_PORT=%q AGENTIC_VDESKTOP_BROWSER_PORT=%q AGENTIC_VDESKTOP_PROFILE=%q AGENTIC_VDESKTOP_MODEL=%q AGENTIC_VDESKTOP_REASONING=%q %q daemon' \
-    "$SESSION" "$MODE" "$DISPLAY_ID" "$GEOMETRY" "$XEPHYR_DEPTH" "$GUI_PORT" "$BROWSER_PORT" "$PROFILE_DIR" "$MODEL" "$REASONING" "$0"
+    'AGENTIC_VDESKTOP_SESSION=%q AGENTIC_VDESKTOP_MODE=%q AGENTIC_VDESKTOP_DISPLAY=%q AGENTIC_VDESKTOP_GEOMETRY=%q AGENTIC_VDESKTOP_XEPHYR_DEPTH=%q AGENTIC_VDESKTOP_XEPHYR_FALLBACK_DEPTH=%q AGENTIC_VDESKTOP_XEPHYR_EXTRA_ARGS=%q AGENTIC_VDESKTOP_GUI_PORT=%q AGENTIC_VDESKTOP_BROWSER_PORT=%q AGENTIC_VDESKTOP_PROFILE=%q AGENTIC_VDESKTOP_MODEL=%q AGENTIC_VDESKTOP_REASONING=%q %q daemon' \
+    "$SESSION" "$MODE" "$DISPLAY_ID" "$GEOMETRY" "$XEPHYR_DEPTH" "$XEPHYR_FALLBACK_DEPTH" "$XEPHYR_EXTRA_ARGS" "$GUI_PORT" "$BROWSER_PORT" "$PROFILE_DIR" "$MODEL" "$REASONING" "$0"
   tmux new-session -d -s "$SESSION" "$command"
   wait_for_service
   "$0" status
