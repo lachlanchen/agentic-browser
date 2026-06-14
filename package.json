@@ -1,6 +1,6 @@
 {
   "name": "@lazyingart/aginti-browser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AgInTi Browser is a local-first Chrome/CDP browser workbench for human-supervised AI browsing, powered by AgInTi Flow.",
   "type": "module",
   "bin": {
