@@ -50,18 +50,21 @@ Prefer GitHub Actions trusted publishing for repeat releases. This is the same
 method used by `../AgenticApp`: npm trusts a specific GitHub workflow through
 OIDC, so GitHub can publish without a local OTP or long-lived publish token.
 
-Trusted publishing is already configured for this package. Future releases can
-use the helper script:
+After the repo rename to `lachlanchen/aginti-browser`, verify or re-link npm
+Trusted Publisher before relying on tokenless releases. If the GitHub workflow
+fails with `E404 Not Found - PUT ... @lazyingart%2faginti-browser`, npm trust is
+not linked to the current repository or the publisher lacks package access.
+
+After trust is linked, future releases can use the helper script:
 
 ```bash
-npm run release:npm -- 0.1.1
 npm run release:npm -- patch
 ```
 
 The helper requires a clean working tree, bumps `package.json`, runs `npm test`
 and `npm pack --dry-run`, commits, tags, pushes, and triggers the GitHub Actions
-publish workflow. It does not require local npm login, OTP, browser
-confirmation, or npm tokens.
+publish workflow. Once npm trust is linked, it does not require local npm login,
+OTP, browser confirmation, or npm tokens.
 
 Trusted Publisher settings on npm:
 
@@ -77,6 +80,10 @@ Equivalent setup command:
 npm install -g npm@^11.10.0
 npm trust github @lazyingart/aginti-browser --repo lachlanchen/aginti-browser --file npm-publish.yml
 ```
+
+The package currently exists on npm, but registry metadata from the earlier
+bootstrap may still point at the old `lachlanchen/agentic-browser` repository
+until a new version publishes successfully from this repo.
 
 After npm trust is configured, publish from GitHub manually if needed:
 

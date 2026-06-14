@@ -49,7 +49,7 @@ AgInTi Browser acknowledges and is powered by [AgInTi Flow](https://flow.lazying
 
 ```bash
 git clone https://github.com/lachlanchen/aginti-browser.git
-cd agentic-browser
+cd aginti-browser
 python3 -m pip install -r requirements.txt
 ./run-agentic-browser-vdesktop.sh start
 ```
@@ -87,13 +87,20 @@ aginti-browser --help
 agentic-browser --help
 ```
 
-Future npm releases use GitHub trusted publishing, so local npm login, OTP, browser confirmation, and npm tokens are not needed:
+The package is published on npm as `@lazyingart/aginti-browser` and exposes
+both `aginti-browser` and `agentic-browser`. The unscoped npm name
+`agentic-browser` belongs to another project, so use the scoped package name.
+
+After the repo rename, npm Trusted Publisher must be linked to
+`lachlanchen/aginti-browser` before tokenless releases work:
 
 ```bash
+npm trust github @lazyingart/aginti-browser --repo lachlanchen/aginti-browser --file npm-publish.yml
 npm run release:npm -- patch
 ```
 
-The first publish has already been bootstrapped and npm trust is configured for `lachlanchen/aginti-browser`. For local token fallback, put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or point at an existing trusted env file:
+For local token fallback, put `NPM_TOKEN` or `NODE_AUTH_TOKEN` in `.env`, or
+point at an existing trusted env file:
 
 ```bash
 AGINTI_BROWSER_NPM_ENV=/home/lachlan/ProjectsLFS/Agent/AgInTiFlow/.env npm run publish:env:whoami
